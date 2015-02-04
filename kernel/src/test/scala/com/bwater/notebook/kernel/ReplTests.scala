@@ -12,7 +12,7 @@ class ReplTests extends FunSuite with BeforeAndAfter with Matchers {
   var repl: Repl = _
 
   before {
-    repl = new Repl
+    repl = new Repl(List.empty, isRemote = true)
   }
 
   test("evaluating should return toString when no other renderer") {

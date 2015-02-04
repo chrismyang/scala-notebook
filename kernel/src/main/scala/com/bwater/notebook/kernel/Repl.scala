@@ -23,9 +23,7 @@ import collection.JavaConversions
 import java.net.{URLDecoder, JarURLConnection}
 import scala.util.control.NonFatal
 
-class Repl(compilerOpts: List[String]) {
-
-  def this() = this(Nil)
+class Repl(compilerOpts: List[String], isRemote: Boolean) {
 
   class MyOutputStream extends ByteArrayOutputStream {
     var aop: String => Unit = x => ()
@@ -62,7 +60,10 @@ class Repl(compilerOpts: List[String]) {
     // TODO: This causes tests to fail in SBT, but work in IntelliJ
     // The java CP in SBT contains only a few SBT entries (no project entries), while
     // in intellij it has the full module classpath + some intellij stuff.
-    settings.usejavacp.value = true
+    // CY: Cargo culting to great victory.  When running in a child process, I need the value to be true.  When running
+    // in-process, I need it to be false.  I'm not entirely clear as to why that is the case, but when it's set
+    // incorrectly, I get an exception: "Caused by: scala.reflect.internal.FatalError: class StringContext does not have a member f"
+    settings.usejavacp.value = isRemote
     // println(System.getProperty("java.class.path"))
     val i = new HackIMain(settings, stdout)
     i.initializeSynchronous()

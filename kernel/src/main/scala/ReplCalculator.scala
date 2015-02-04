@@ -45,8 +45,8 @@ case class ObjectInfoResponse(found: Boolean, name: String, callDef: String, cal
  * @param initScripts List of scala source strings to be executed during REPL startup.
  * @param compilerArgs Command line arguments to pass to the REPL compiler
  */
-class ReplCalculator(initScripts: List[String], compilerArgs: List[String]) extends Actor with akka.actor.ActorLogging {
-  private lazy val repl = new Repl(compilerArgs)
+class ReplCalculator(initScripts: List[String], compilerArgs: List[String], replIsRemote: Boolean) extends Actor with akka.actor.ActorLogging {
+  private lazy val repl = new Repl(compilerArgs, replIsRemote)
 
   // Make a child actor so we don't block the execution on the main thread, so that interruption can work
   private val executor = context.actorOf(Props(new Actor {

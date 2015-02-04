@@ -21,7 +21,7 @@ import scala.concurrent.duration._
 /**
  * Provides a web-socket interface to the Calcualtor
  */
-class CalcWebSocketService(system: ActorSystem, initScripts: List[String], compilerArgs: List[String], remoteDeployFuture: Future[Deploy]) {
+class CalcWebSocketService(system: ActorSystem, initScripts: List[String], compilerArgs: List[String], maybeRemoteDeployFuture: Option[Future[Deploy]]) {
   implicit val executor = system.dispatcher
 
   val ioPubPromise = Promise[WebSockWrapper]
@@ -36,12 +36,20 @@ class CalcWebSocketService(system: ActorSystem, initScripts: List[String], compi
     var shell: WebSockWrapper = null
 
     private def spawnCalculator() {
-      // N.B.: without these local copies of the instance variables, we'll capture all sorts of things in our closure
-      // that we don't want, then akka's attempts at serialization will fail and kittens everywhere will cry.
-      val kCompilerArgs = compilerArgs
-      val kInitScripts = initScripts
-      val remoteDeploy = Await.result(remoteDeployFuture, 2 minutes)
-      calculator = context.actorOf(Props(new ReplCalculator(kInitScripts, kCompilerArgs)).withDeploy(remoteDeploy))
+      (for {
+        remoteDeployFuture <- maybeRemoteDeployFuture
+      } yield {
+        // N.B.: without these local copies of the instance variables, we'll capture all sorts of things in our closure
+        // that we don't want, then akka's attempts at serialization will fail and kittens everywhere will cry.
+        val kCompilerArgs = compilerArgs
+        val kInitScripts = initScripts
+        val remoteDeploy = Await.result(remoteDeployFuture, 2 minutes)
+        calculator = context.actorOf(Props(new ReplCalculator(kInitScripts, kCompilerArgs, replIsRemote = true)).withDeploy(remoteDeploy))
+      }).getOrElse {
+        val kCompilerArgs = compilerArgs
+        val kInitScripts = initScripts
+        calculator = context.actorOf(Props(new ReplCalculator(kInitScripts, kCompilerArgs, replIsRemote = false)))
+      }
     }
 
     override def preStart() {
