@@ -153,6 +153,10 @@ object Server extends Logging {
           logInfo("shutting down server")
           KernelManager.shutdown()
           app.system.shutdown()
+          logInfo("shutdown complete")
       })
+
+
+    sys.exit(0)
   }
 }

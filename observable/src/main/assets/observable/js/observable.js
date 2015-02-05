@@ -206,21 +206,21 @@ return new function () {
     // TODO: This is not a great place for this function; put it somewhere else
     /** Returns a thunk to be evaluated to execute the scoped script tags.
      */
-    this.scopedEval = function (toEval) {
-        var callbacks = $('script[type="text/x-scoped-javascript"]', toEval).map(function () {
-            var data = $.parseJSON($(this).attr('data-this')) || {};
-            var scope = this.parentElement;
-            var source = this.textContent;
-            $(this).remove();
+      this.scopedEval = function (toEval) {
+          var callbacks = $('script[type="text/x-scoped-javascript"]', toEval).map(function () {
+              var data = $.parseJSON($(this).attr('data-this')) || {};
+              var scope = this.parentElement;
+              var source = this.textContent;
+              $(this).remove();
 
-            data.require = function (requirements, callback) {
-              curl(requirements, function () { callback.apply(scope, arguments); });
-            };
+              data.require = function (requirements, callback) {
+                curl(requirements, function () { callback.apply(scope, arguments); });
+              };
 
-            return function () { (function() { with (data) { eval(source); } }).call(scope); };
-        });
-        return function () { callbacks.each(function () { this.call(); }); };
-    };
+              return function () { (function() { with (data) { eval(source); } }).call(scope); };
+          });
+          return function () { callbacks.each(function () { this.call(); }); };
+      };
 
     this.start();
 };

@@ -47,10 +47,10 @@ package object widgets {
   def html(html: NodeSeq): Widget = new SimpleWidget(html)
 
   def layout(width: Int, contents: Seq[Widget]): Widget = html(
-    <table>{
+    <table style="border: 1px solid black;">{
       contents grouped width map { row =>
-        <tr>{
-          row map { html => <td>{html}</td> }
+        <tr style="border: 1px solid black;">{
+          row map { html => <td style="padding: 10px">{html}</td> }
         }</tr>
       }
     }</table>)

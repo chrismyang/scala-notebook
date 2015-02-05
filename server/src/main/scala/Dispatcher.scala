@@ -206,7 +206,7 @@ class Dispatcher(protected val config: ScalaNotebookConfig,
       val initScripts = config.kernelInitScripts
       val kernel = new Kernel(system)
       KernelManager.add(kernelId, kernel)
-      val service = new CalcWebSocketService(system, initScripts, compilerArgs, None /* kernel.remoteDeployFuture*/)
+      val service = new CalcWebSocketService(system, initScripts, compilerArgs, Some(kernel.remoteDeployFuture))
       kernelIdToCalcService += kernelId -> service
       val json = ("kernel_id" -> kernelId) ~ ("ws_url" -> "ws:/%s:%d".format(domain, port))
       JsonContent ~> ResponseString(compact(render(json))) ~> Ok

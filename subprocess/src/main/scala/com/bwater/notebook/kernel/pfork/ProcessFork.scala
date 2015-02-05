@@ -35,7 +35,7 @@ class ProcessFork[A: Manifest] {
   def permGen: Long = -1
   def reservedCodeCache: Long = -1
   def server: Boolean = true
-  def debug: Boolean = false // If true, then you will likely get address in use errors spawning multiple processes
+  def debug: Boolean = true // If true, then you will likely get address in use errors spawning multiple processes
   def classPath: IndexedSeq[String] = defaultClassPath
   def classPathString = classPath.mkString(File.pathSeparator)
 
@@ -53,7 +53,7 @@ class ProcessFork[A: Manifest] {
     ifNonNeg(permGen, "-XX:MaxPermSize=")
     ifNonNeg(reservedCodeCache, "-XX:ReservedCodeCacheSize=")
     if (server) builder += "-server"
-    if (debug) builder ++= IndexedSeq("-Xdebug", "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005")
+    if (debug) builder ++= IndexedSeq("-Xdebug", "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=9999")
     builder.result()
   }
 
