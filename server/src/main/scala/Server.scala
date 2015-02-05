@@ -33,12 +33,12 @@ object Server extends Logging {
       case None =>
     }
   }
-  
+
   def main(args: Array[String]) {
     startServer(args, ScalaNotebookConfig.withOverrides(ScalaNotebookConfig.defaults))(openBrowser)
   }
 
-  private val preferredPort = 8899
+  private val preferredPort = 8888
 
   // This is basically unfiltered.util.Port.any with a preferred port, and is host-aware. Like the original, this
   // approach can be really unlucky and have someone else steal our port between opening this socket and when unfiltered
