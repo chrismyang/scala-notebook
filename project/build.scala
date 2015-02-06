@@ -7,6 +7,8 @@
 import org.apache.ivy.core.module.id.ModuleRevisionId
 import sbt._
 import Keys._
+import sbtassembly.Plugin._
+import AssemblyKeys._
 import org.apache.ivy.core.install.InstallOptions
 import com.untyped.sbtjs.Plugin._
 import scala.Some
@@ -15,6 +17,12 @@ object NotebookBuild extends Build {
 
   implicit def toRichProject(project: Project) = new RichProject(project)
   import Dependencies._
+
+  lazy val buildSettings = Defaults.defaultSettings ++ Seq(
+    version := "0.1-SNAPSHOT",
+    organization := "Bridgewater",
+    scalaVersion := "2.10.4"
+  )
 
   override def settings = super.settings ++ Seq(
     organization := "com.bwater",
@@ -108,12 +116,12 @@ object NotebookBuild extends Build {
       ),
 
       libraryDependencies ++= Seq(
-        "org.scala-lang" % "jline" % scalaVersion.value,
+        ("org.scala-lang" % "jline" % scalaVersion.value).exclude("org.fusesource.jansi", "jansi"),
         "org.scala-lang" % "scala-compiler" % scalaVersion.value
       )
     )
 
-  lazy val server = Project(id = "server", base = file("server"))
+  lazy val server = Project(id = "server", base = file("server"), settings = buildSettings ++ assemblySettings)
     .dependsOn(common, kernel)
     .projectDefaults
     .withWebAssets
